@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meteoritos en la Tierra · NASA</title>
+
+  <!-- Fuentes: Orbitron para títulos (estilo espacial), DM Sans para cuerpo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Chart.js y PapaParse desde CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================================================
+       FONDO ANIMADO: estrellas decorativas generadas con CSS
+  ============================================================ -->
+  <div class="stars-bg" aria-hidden="true">
+    <div class="stars s1"></div>
+    <div class="stars s2"></div>
+    <div class="stars s3"></div>
+  </div>
+
+  <!-- ============================================================
+       ENCABEZADO PRINCIPAL
+  ============================================================ -->
+  <header>
+    <div class="header-inner">
+      <!-- Logo / ícono NASA -->
+      <div class="nasa-badge">
+        <span class="nasa-text">NASA</span>
+        <span class="nasa-sub">OPEN DATA</span>
+      </div>
+
+      <div class="header-content">
+        <p class="header-eyebrow">&#9679; Datathon · Categoría 1 · Dashboard</p>
+        <h1>Meteoritos en la Tierra</h1>
+        <p class="header-tagline">Registros históricos de NASA</p>
+        <p class="header-desc">
+          Este dashboard visualiza los registros históricos de meteoritos documentados por NASA,
+          explorando patrones relacionados con el año de registro, tipo de clasificación,
+          masa, forma de hallazgo (<em>Fell</em> / <em>Found</em>) y localización geográfica.
+          Los datos provienen del conjunto <strong>Meteorite Landings</strong> publicado
+          en el NASA Open Data Portal.
+        </p>
+      </div>
+
+      <!-- Indicador de carga -->
+      <div class="loading-badge" id="loading-badge">
+        <div class="spinner"></div>
+        <span>Cargando datos…</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============================================================
+         TARJETAS DE RESUMEN
+    ============================================================ -->
+    <section class="section-block">
+      <h2 class="section-title"><span class="sec-num">01</span> Indicadores clave</h2>
+      <div class="cards-grid">
+
+        <div class="card" id="card-total">
+          <div class="card-glow"></div>
+          <div class="card-icon">&#9652;</div>
+          <div class="card-value" id="val-total">—</div>
+          <div class="card-label">Total de meteoritos<br>registrados</div>
+        </div>
+
+        <div class="card" id="card-mass">
+          <div class="card-glow"></div>
+          <div class="card-icon">&#9670;</div>
+          <div class="card-value" id="val-mass">—</div>
+          <div class="card-label">Masa promedio<br>(gramos)</div>
+        </div>
+
+        <div class="card card-accent" id="card-max">
+          <div class="card-glow"></div>
+          <div class="card-icon">&#11088;</div>
+          <div class="card-value" id="val-max">—</div>
+          <div class="card-label">Meteorito de<br>mayor masa</div>
+        </div>
+
+        <div class="card" id="card-year">
+          <div class="card-glow"></div>
+          <div class="card-icon">&#128197;</div>
+          <div class="card-value" id="val-year">—</div>
+          <div class="card-label">Año con más<br>registros</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GRÁFICA 1: Registros por año (línea)
+    ============================================================ -->
+    <section class="section-block">
+      <h2 class="section-title"><span class="sec-num">02</span> Registros por año</h2>
+      <p class="section-desc">Número de meteoritos registrados por año. Se muestran únicamente los años con registros válidos entre 860 y 2013.</p>
+      <div class="chart-card chart-wide">
+        <canvas id="chart-year"></canvas>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GRÁFICAS 2 y 3: Fell vs Found  +  Top clasificaciones
+    ============================================================ -->
+    <section class="section-block">
+      <h2 class="section-title"><span class="sec-num">03</span> Forma de hallazgo y clasificación</h2>
+      <div class="charts-row">
+
+        <div class="chart-card chart-donut-wrap">
+          <h3 class="chart-subtitle">Fell vs Found</h3>
+          <p class="chart-note">Meteoritos observados al caer (Fell) o encontrados después (Found).</p>
+          <div class="donut-container">
+            <canvas id="chart-fall"></canvas>
+            <div class="donut-center" id="donut-label">—</div>
+          </div>
+        </div>
+
+        <div class="chart-card chart-classes-wrap">
+          <h3 class="chart-subtitle">Top 10 clasificaciones más frecuentes</h3>
+          <p class="chart-note">Las diez clases de meteoritos con más registros en el dataset.</p>
+          <div class="chart-h-wrap">
+            <canvas id="chart-class"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GRÁFICA 4: Top 10 por masa
+    ============================================================ -->
+    <section class="section-block">
+      <h2 class="section-title"><span class="sec-num">04</span> Los 10 meteoritos más masivos</h2>
+      <p class="section-desc">Meteoritos con mayor masa registrada, expresada en kilogramos para facilitar la lectura.</p>
+      <div class="chart-card chart-wide">
+        <canvas id="chart-top10"></canvas>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         GRÁFICA 5: Registros por década
+    ============================================================ -->
+    <section class="section-block">
+      <h2 class="section-title"><span class="sec-num">05</span> Registros por década</h2>
+      <p class="section-desc">Agrupación de todos los meteoritos registrados por década, mostrando la evolución histórica de las campañas de recolección.</p>
+      <div class="chart-card chart-wide">
+        <canvas id="chart-decade"></canvas>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       PIE DE PÁGINA
+  ============================================================ -->
+  <footer>
+    <p>
+      Fuente de datos: <strong>NASA Open Data Portal</strong> · Meteorite Landings Dataset ·
+      Visualización elaborada con <strong>Chart.js</strong> y <strong>PapaParse</strong>
+    </p>
+  </footer>
+
+  <!-- Script principal -->
+  <script src="script.js"></script>
+
+</body>
+</html>
